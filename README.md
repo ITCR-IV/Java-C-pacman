@@ -19,25 +19,36 @@ Se va a usar un thread por cliente y un thread para el prompt de comandos.
 
 ### Comandos
 
+- help
+
+Muestra los comandos disponibles
+
 - quit
+
 Se sale de la sesión
 
-- fantasmas <n>
-Crea n fantasmas en el mapa
+- Blinky/Pinky/Inky/Clyde [jugador]
 
-- pastillas
+Envía al fantasma correspondiente
+
+- pastillas [jugador]
+
 Resetea las pastillas grandes del juego
 
-- pastillitas
+- pasti [jugador]
+
 Resetea las pastillas pequeñas del juego
 
-- fruta <valor>
+- fruta <valor> [jugador]
+
 Crea una fruta con un valor dado
 
-- velocidad +/- [n]
+- velocidad +/- [n] [jugador]
+
 Cambia la velocidad de los fantasmas, aumentando con un + y disminuyendo con un -. Se puede especificar un 'n' de qué tanto variar la velocidad, si se omite se toma como 1.
 
 
+**Nota:** El campo opcional [jugador] es para escoger a cuál jugador enviarle el comando, si no se incluye por default es 0 (el primer jugador).
 
 
 ## Cliente jugador

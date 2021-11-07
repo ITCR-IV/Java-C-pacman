@@ -17,6 +17,28 @@ Servidor hecho en C
 El servidor puede aceptar múltiples clientes al mismo tiempo (aunque solo 2 máximos jugadores).
 Se va a usar un thread por cliente y un thread para el prompt de comandos.
 
+### Comandos
+
+- quit
+Se sale de la sesión
+
+- fantasmas <n>
+Crea n fantasmas en el mapa
+
+- pastillas
+Resetea las pastillas grandes del juego
+
+- pastillitas
+Resetea las pastillas pequeñas del juego
+
+- fruta <valor>
+Crea una fruta con un valor dado
+
+- velocidad +/- [n]
+Cambia la velocidad de los fantasmas, aumentando con un + y disminuyendo con un -. Se puede especificar un 'n' de qué tanto variar la velocidad, si se omite se toma como 1.
+
+
+
 
 ## Cliente jugador
 

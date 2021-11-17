@@ -5,6 +5,7 @@
 
 #include "threads.h"
 
+// Función para parsear comandos relacionados a fantasmas
 void ghost(int which, char* args){
 	char* ghost_str;
 	switch(which) {
@@ -38,6 +39,10 @@ void ghost(int which, char* args){
 	}
 }
 
+// Función para parsear los comandos relacionados a las pastillas
+// Entradas:
+// 	which: 0 = pastillas grandes, 1 = pastillas pequeñas
+// 	args: Array que contiene los argumentos de la función
 void pastillas(int which, char* args){
 	// which = 0: big ones
 	// which = 1: smol ones
@@ -100,7 +105,8 @@ char* help_text = "posibles comandos:\n"
 		fscanf(stdin, "%29s", command);
 
 		// args
-		fgets (args, sizeof(args), stdin);
+		fgets (args, sizeof(args)-1, stdin);
+		args[sizeof(args)-1] = 0;
 
 		// remove newlines
 		args[strcspn(args, "\r\n")] = 0;
@@ -109,7 +115,7 @@ char* help_text = "posibles comandos:\n"
 		//printf("And the following args were used: '%s'\n", args);
 		printf("\n");
 
-		if(strcmp(command, "quit") == 0)
+		if(strcmp(command, "quit") == 0 || strcmp(command, "exit") == 0)
 			setQuit(1);
 		else if(strcmp(command, "help") == 0)
 			printf(help_text);

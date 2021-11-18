@@ -8,32 +8,13 @@ public class SockManager implements Runnable {
         OBSERVER, PLAYER
     }
 
-    // private enum PossibleKeys implements JsonKey {
-    // ERROR("Error");
-
-    // private final Object value;
-
-    // PossibleKeys(final Object value) {
-    // this.value = value;
-    // }
-
-    // @Override
-    // public String getKey() {
-    // return this.name();
-    // }
-
-    // @Override
-    // public Object getValue() {
-    // return this.value;
-    // }
-    // }
-
     // initialize socket output stream
     private Socket socket = null;
     private PrintWriter out = null;
     private BufferedReader in = null;
     private ClientType type;
     private boolean quit = false;
+    private boolean offline = false;
 
     private void buildSocket(String address, int port) {
         // establish a connection
@@ -50,16 +31,23 @@ public class SockManager implements Runnable {
         }
     }
 
-    // constructor para jugadores
+    // Este constructor conecta un jugador
     public SockManager(String address, int port) {
         type = ClientType.PLAYER;
         buildSocket(address, port);
         JsonObject json = new JsonObject();
         json.put("init", "player");
-        out.println(Jsoner.serialize(json));
+        try {
+            out.println(Jsoner.serialize(json));
+        } catch (NullPointerException n) {
+            System.out.println(n);
+            System.out.println("No se pudo abrir el socket.");
+            offline = true;
+        }
+
     }
 
-    // constructor to put ip address and port
+    // Este constructor conecta un observador al jugador observedPlayer
     public SockManager(String address, int port, int observedPlayer) {
         type = ClientType.OBSERVER;
         buildSocket(address, port);
@@ -67,8 +55,13 @@ public class SockManager implements Runnable {
         JsonObject json = new JsonObject();
         json.put("init", "observer");
         json.put("observee", observedPlayer);
-        out.println(Jsoner.serialize(json));
-
+        try {
+            out.println(Jsoner.serialize(json));
+        } catch (NullPointerException n) {
+            System.out.println(n);
+            System.out.println("No se pudo abrir el socket.");
+            offline = true;
+        }
     }
 
     public void sendInfo(String infoMsg) {
@@ -78,6 +71,9 @@ public class SockManager implements Runnable {
     }
 
     public void sendJSON(JsonObject json) {
+        if (offline) {
+            return;
+        }
         synchronized (socket) {
             out.println(Jsoner.serialize(json));
         }
@@ -100,6 +96,9 @@ public class SockManager implements Runnable {
     }
 
     public void run() {
+        if (offline) {
+            return;
+        }
         while (!quit) {
             try {
                 JsonObject json = (JsonObject) Jsoner.deserialize(in);

@@ -12,26 +12,23 @@ public class PlayingField extends JPanel implements ActionListener {
     private boolean runningGame = false;
     private boolean dying = false;
 
-    private final int GRID_SIZE = 24;
-    private final int N_HORIZONTAL= 26;
-    private final int N_VERTICAL= 29;
-    private final int SCREEN_SIZE_X = GRID_SIZE*N_HORIZONTAL;
-    private final int SCREEN_SIZE_Y = GRID_SIZE*N_VERTICAL;
-    private final int MAX_GHOSTS = 4;
-    private final int PACMAN_SPEED = 6;
+    public final int GRID_SIZE = 24;
+    public final int N_HORIZONTAL= 26;
+    public final int N_VERTICAL= 29;
+    public final int SCREEN_SIZE_X = GRID_SIZE*N_HORIZONTAL;
+    public final int SCREEN_SIZE_Y = GRID_SIZE*N_VERTICAL;
+    public final int MAX_GHOSTS = 4;
 
     private int numGhosts = 0;
-    private int lives, score;
+
+    private int score;
     private int[] dx, dy;
     private int[] ghostX, ghostY, ghostDX, ghostDY, ghostSpeed;
 
-    private Image heart, inky, blinky, pinky, clyde, pacUp, pacDown, pacLeft, pacRight;
+    private Image inky, blinky, pinky, clyde;
 
-    private int pacManX, pacManY, pacManDX, pacManDY;
     private int reqDX, reqDY;
 
-    private final int PAC_MAX_SPEED = 6;
-    private  int pacCurrentSpeed = 6;
     private short[] screenData;
     private Timer timer;
 
@@ -76,10 +73,6 @@ public class PlayingField extends JPanel implements ActionListener {
     }
 
     private void loadSprites() {
-        pacDown = new ImageIcon("src/Sprites/down.gif").getImage();
-        pacUp = new ImageIcon("src/Sprites/up.gif").getImage();
-        pacLeft = new ImageIcon("src/Sprites/left.gif").getImage();
-        pacRight = new ImageIcon("src/Sprites/right.gif").getImage();
         inky = new ImageIcon("src/Sprites/Inky0.gif").getImage();
         pinky = new ImageIcon("src/Sprites/pinky0.gif").getImage();
         blinky = new ImageIcon("src/Sprites/Blinky0.gif").getImage();
@@ -101,11 +94,10 @@ public class PlayingField extends JPanel implements ActionListener {
     }
 
     private void startGame(){
-        lives = 3;
+        PacMan.getInstance().setLives(3);
         score = 0;
         startLevel();
         numGhosts=1;
-        pacCurrentSpeed = 6;
     }
 
     private void startLevel(){
@@ -120,61 +112,10 @@ public class PlayingField extends JPanel implements ActionListener {
         if (dying){
             death();
         } else{
-            movePacman();
-            drawPacman(g2d);
+            PacMan.getInstance().movePacman(this);
+            PacMan.getInstance().drawPacman(this,g2d);
             moveGhosts(g2d);
             checkMaze();
-        }
-    }
-
-    private void movePacman(){
-        int pos;
-        short ch;
-        if ((pacManX % GRID_SIZE == 0) && (pacManY % GRID_SIZE == 0)){
-            pos = pacManX/GRID_SIZE + (N_HORIZONTAL * (pacManY/GRID_SIZE));
-            ch = screenData[pos];
-
-            if ((ch & 16) != 0){
-                screenData[pos] = (short)(ch & 47);
-                score++;
-            }
-            if ((ch & 32) != 0){
-                if (pacManX < 100){
-                    pacManX = pacManX + GRID_SIZE*25;
-                } else{
-                    pacManX = pacManX - GRID_SIZE*25;
-                }
-            }
-            if (reqDX != 0 || reqDY != 0){
-                if (!((reqDX == -1 && reqDY == 0 && (ch & 1) != 0)
-                        || (reqDX == 1 && reqDY == 0 && (ch & 4) != 0)
-                        || (reqDX == 0 && reqDY == -1 && (ch & 2) != 0)
-                        || (reqDX == 0 && reqDY == 1 && (ch & 8) != 0))){
-                    pacManDX = reqDX;
-                    pacManDY = reqDY;
-                }
-            }
-            if ((pacManDX == -1 && pacManDY == 0 && (ch & 1) != 0)
-                    || (pacManDX == 1 && pacManDY == 0 && (ch & 4) != 0)
-                    || (pacManDX == 0 && pacManDY == -1 && (ch & 2) != 0)
-                    || (pacManDX == 0 && pacManDY == 1 && (ch & 8) != 0)) {
-                pacManDX = 0;
-                pacManDY = 0;
-            }
-        }
-        pacManX = pacManX + PACMAN_SPEED*pacManDX;
-        pacManY = pacManY + PACMAN_SPEED*pacManDY;
-    }
-
-    public void drawPacman(Graphics2D g2d){
-        if (reqDX == -1){
-            g2d.drawImage(pacLeft,pacManX+1,pacManY+1,this);
-        } else if (reqDX == 1){
-            g2d.drawImage(pacRight,pacManX+1,pacManY+1,this);
-        } else if (reqDY == -1){
-            g2d.drawImage(pacUp,pacManX+1,pacManY+1,this);
-        } else if (reqDY == 1){
-            g2d.drawImage(pacDown,pacManX+1,pacManY+1,this);
         }
     }
 
@@ -234,8 +175,8 @@ public class PlayingField extends JPanel implements ActionListener {
            ghostY[i] = ghostY[i] + (ghostDY[i] * ghostSpeed[i]);
            drawGhost(g2d,ghostX[i]+1,ghostY[i]+1);
 
-           if (((pacManX > (ghostX[i] - 12)) && (pacManX < (ghostX[i] + 12)))
-                   && ((pacManY > (ghostY[i] - 12)) && (pacManY < (ghostY[i] + 12)))
+           if (((PacMan.getInstance().getPacManX() > (ghostX[i] - 12)) && (PacMan.getInstance().getPacManX() < (ghostX[i] + 12)))
+                   && ((PacMan.getInstance().getPacManY() > (ghostY[i] - 12)) && (PacMan.getInstance().getPacManY() < (ghostY[i] + 12)))
                    && runningGame) {
                dying = true;
            }
@@ -253,8 +194,8 @@ public class PlayingField extends JPanel implements ActionListener {
         g2d.setColor(new Color(5,151,79));
         String s = "Score:" + score;
         g2d.drawString(s,SCREEN_SIZE_X/2 + 200, SCREEN_SIZE_Y+16);
-        for (int i = 0; i<lives;i++){
-            g2d.drawImage(pacRight,i*28+8,SCREEN_SIZE_Y+1,this);
+        for (int i = 0; i<PacMan.getInstance().getLives();i++){
+            g2d.drawImage(PacMan.getInstance().getPacRight(),i*28+8,SCREEN_SIZE_Y+1,this);
         }
     }
 
@@ -278,8 +219,8 @@ public class PlayingField extends JPanel implements ActionListener {
     }
 
     private void death(){
-        lives--;
-        if (lives == 0){
+        PacMan.getInstance().setLives(PacMan.getInstance().getLives()-1);
+        if (PacMan.getInstance().getLives() == 0){
             runningGame = false;
         }
         continueLevel();
@@ -330,13 +271,13 @@ public class PlayingField extends JPanel implements ActionListener {
             ghostDX[i] = dx;
             ghostDY[i] = 0;
             dx = -dx;
-            ghostSpeed[i] = PAC_MAX_SPEED;
+            ghostSpeed[i] = PacMan.getInstance().PAC_SPEED;
         }
 
-        pacManX = 13 * GRID_SIZE;
-        pacManY = 22 * GRID_SIZE;
-        pacManDX = 0;
-        pacManDY = 0;
+        PacMan.getInstance().setPacManX(13 * GRID_SIZE);
+        PacMan.getInstance().setPacManY(22 * GRID_SIZE);
+        PacMan.getInstance().setPacManDX(0);
+        PacMan.getInstance().setPacManDY(0) ;
         reqDX = 0;
         reqDY = 0;
         dying = false;
@@ -396,5 +337,33 @@ public class PlayingField extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         repaint();
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public int[] getDx() {
+        return dx;
+    }
+
+    public int[] getDy() {
+        return dy;
+    }
+
+    public int getReqDX() {
+        return reqDX;
+    }
+
+    public int getReqDY() {
+        return reqDY;
+    }
+
+    public short[] getScreenData() {
+        return screenData;
     }
 }

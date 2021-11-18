@@ -33,7 +33,7 @@ public final class PacMan {
 
             if ((ch & 16) != 0){
                 pf.getScreenData()[pos] = (short)(ch & 47);
-                pf.setScore(pf.getScore()+1);
+                pf.setScore(pf.getScore()+10);
             }
             if ((ch & 32) != 0){
                 if (pacManX < 100){
@@ -41,6 +41,10 @@ public final class PacMan {
                 } else{
                     pacManX = pacManX - pf.GRID_SIZE*25;
                 }
+            }
+            if ((ch & 64) != 0){
+                pf.getScreenData()[pos] = (short)(ch & 47);
+                pf.activatePowerUp();
             }
             if (pf.getReqDX() != 0 || pf.getReqDY() != 0){
                 if (!((pf.getReqDX() == -1 && pf.getReqDY() == 0 && (ch & 1) != 0)
@@ -70,7 +74,7 @@ public final class PacMan {
             g2d.drawImage(pacRight,pacManX+1,pacManY+1,pf);
         } else if (pf.getReqDY() == -1){
             g2d.drawImage(pacUp,pacManX+1,pacManY+1,pf);
-        } else if (pf.getReqDY() == 1){
+        } else {
             g2d.drawImage(pacDown,pacManX+1,pacManY+1,pf);
         }
     }

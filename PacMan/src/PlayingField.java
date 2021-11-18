@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.concurrent.TimeUnit;
 
 public class PlayingField extends JPanel implements ActionListener {
 
@@ -23,39 +24,42 @@ public class PlayingField extends JPanel implements ActionListener {
 
     private int score;
     private int[] dx, dy;
-    private int[] ghostX, ghostY, ghostDX, ghostDY, ghostSpeed;
-
-    private Image inky, blinky, pinky, clyde;
 
     private int reqDX, reqDY;
 
+    private short[] validSpeeds = {1,2,3,4,6,8};
+    private short currentSpeed = 2;
     private short[] screenData;
     private Timer timer;
+
+    private Ghost[] ghosts = new Ghost[MAX_GHOSTS];
+
+    private Fruit currentFruit;
 
     private final short levelInfo[] = {
             19, 26, 26, 26, 26, 18, 26, 26, 26, 26, 26, 22,  0,  0, 19, 26, 26, 26, 26, 26, 18, 26, 26, 26, 26, 22,
             21,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0,  0,  0, 21,
-            21,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0,  0,  0, 21,
+            69,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0,  0,  0, 69,
             21,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0,  0,  0, 21,
             17, 26, 26, 26, 26, 16, 26, 26, 18, 26, 26, 24, 26, 26, 24, 26, 26, 18, 26, 26, 16, 26, 26, 26, 26, 20,
             21,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0, 21,
             21,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0, 21,
             25, 26, 26, 26, 26, 20,  0,  0, 25, 26, 26, 22,  0,  0, 19, 26, 26, 28,  0,  0, 17, 26, 26, 26, 26, 28,
-             0,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0,
-             0,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0,
-             0,  0,  0,  0,  0, 21,  0,  0, 19, 26, 26, 24, 26, 26, 24, 26, 26, 22,  0,  0, 21,  0,  0,  0,  0,  0,
-             0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,
-             0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,
-            58, 26, 26, 26, 26, 16, 26, 26, 20,  0,  0,  0,  0,  0,  0,  0,  0, 17, 26, 26, 16, 26, 26, 26, 26, 58,
-             0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,
-             0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,
-             0,  0,  0,  0,  0, 21,  0,  0, 17, 26, 26, 26, 26, 26, 26, 26, 26, 20,  0,  0, 21,  0,  0,  0,  0,  0,
-             0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,
-             0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,
+             0,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0,
+             0,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0,
+             0,  0,  0,  0,  0, 21,  0,  0,  3, 10, 10,  8, 10, 10,  8, 10, 10,  6,  0,  0, 21,  0,  0,  0,  0,  0,
+             0,  0,  0,  0,  0, 21,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 21,  0,  0,  0,  0,  0,
+             0,  0,  0,  0,  0, 21,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 21,  0,  0,  0,  0,  0,
+            42, 10, 10, 10, 10, 16, 10, 10,  4,  0,  0,  0,  0,  0,  0,  0,  0,  1, 10, 10, 16, 10, 10, 10, 10, 42,
+             0,  0,  0,  0,  0, 21,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 21,  0,  0,  0,  0,  0,
+             0,  0,  0,  0,  0, 21,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 21,  0,  0,  0,  0,  0,
+             0,  0,  0,  0,  0, 21,  0,  0,  1, 10, 10, 10, 10, 10, 10, 10, 10,  4,  0,  0, 21,  0,  0,  0,  0,  0,
+             0,  0,  0,  0,  0, 21,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 21,  0,  0,  0,  0,  0,
+             0,  0,  0,  0,  0, 21,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 21,  0,  0,  0,  0,  0,
             19, 26, 26, 26, 26, 16, 26, 26, 24, 26, 26, 22,  0,  0, 19, 26, 26, 24, 26, 26, 16, 26, 26, 26, 26, 22,
             21,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0,  0,  0, 21,
             21,  0,  0,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0, 21,  0,  0,  0,  0, 21,
-            25, 26, 22,  0,  0, 17, 26, 26, 18, 26, 26, 24, 26, 26, 24, 26, 26, 18, 26, 26, 20,  0,  0, 19, 26, 28,
+            73, 26, 22,  0,  0, 17, 26, 26, 18, 26, 26, 24, 10, 10, 24, 26, 26, 18, 26, 26, 20,  0,  0, 19, 26, 76,
              0,  0, 21,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0, 21,  0,  0,
              0,  0, 21,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0, 21,  0,  0,
             19, 26, 24, 26, 26, 28,  0,  0, 25, 26, 26, 22,  0,  0, 19, 26, 26, 28,  0,  0, 25, 26, 26, 24, 26, 22,
@@ -65,28 +69,17 @@ public class PlayingField extends JPanel implements ActionListener {
     };
 
     public PlayingField(){
-        loadSprites();
         initVariables();
         addKeyListener(new TAdapter());
         setFocusable(true);
         startGame();
     }
 
-    private void loadSprites() {
-        inky = new ImageIcon("src/Sprites/Inky0.gif").getImage();
-        pinky = new ImageIcon("src/Sprites/pinky0.gif").getImage();
-        blinky = new ImageIcon("src/Sprites/Blinky0.gif").getImage();
-        clyde = new ImageIcon("src/Sprites/Clyde0.gif").getImage();
-    }
-
     private void initVariables(){
         screenData = new short[N_HORIZONTAL * N_VERTICAL];
         d = new Dimension(630,750);
-        ghostX = new int [MAX_GHOSTS];
-        ghostDX = new int [MAX_GHOSTS];
-        ghostY = new int [MAX_GHOSTS];
-        ghostDY = new int [MAX_GHOSTS];
-        ghostSpeed = new int [MAX_GHOSTS];
+        numGhosts = 0;
+        ghosts = new Ghost[MAX_GHOSTS];
         dx = new int[4];
         dy = new int[4];
         timer = new Timer(40, this);
@@ -97,7 +90,6 @@ public class PlayingField extends JPanel implements ActionListener {
         PacMan.getInstance().setLives(3);
         score = 0;
         startLevel();
-        numGhosts=1;
     }
 
     private void startLevel(){
@@ -115,81 +107,29 @@ public class PlayingField extends JPanel implements ActionListener {
             PacMan.getInstance().movePacman(this);
             PacMan.getInstance().drawPacman(this,g2d);
             moveGhosts(g2d);
+            if (currentFruit != null){
+                currentFruit.checkFruit(this,g2d);
+                if (currentFruit.isRemoveFruit()){
+                    currentFruit = null;
+                }
+            }
             checkMaze();
         }
     }
 
-    public void moveGhosts(Graphics2D g2d){
-       int pos;
-       int count;
+    private void moveGhosts(Graphics2D g2d){
        for (int i = 0; i < numGhosts; i++){
-           if ( (ghostX[i] % GRID_SIZE == 0) && (ghostY[i] % GRID_SIZE == 0) ){
-               pos = ghostX[i]/GRID_SIZE + N_HORIZONTAL * (ghostY[i]/GRID_SIZE);
-               count = 0;
-               short ch = screenData[pos];
-               if ((ch & 32) != 0){
-                   if (ghostX[i] < 100){
-                       ghostX[i] = ghostX[i] + GRID_SIZE*25;
-                   } else{
-                       ghostX[i] = ghostX[i] - GRID_SIZE*25;
-                   }
-               }
-               if ((screenData[pos]&1) == 0 && ghostDX[i] != 1){
-                   dx[count] = -1;
-                   dy[count] = 0;
-                   count++;
-               }
-               if ((screenData[pos]&2) == 0 && ghostDY[i] != 1){
-                   dx[count] = 0;
-                   dy[count] = -1;
-                   count++;
-               }
-               if ((screenData[pos]&4) == 0 && ghostDX[i] != -1){
-                   dx[count] = 1;
-                   dy[count] = 0;
-                   count++;
-               }
-               if ((screenData[pos]&8) == 0 && ghostDY[i] != -1){
-                   dx[count] = 0;
-                   dy[count] = 1;
-                   count++;
-               }
-               if (count==0){
-                   if ((screenData[pos] & 15) == 15){
-                       ghostDX[i] = 0;
-                       ghostDY[i] = 0;
-                   } else {
-                       ghostDX[i] = -ghostDX[i];
-                       ghostDY[i] = -ghostDX[i];
-                   }
-               } else {
-                   count = (int) (Math.random() * count);
-                   if (count > 3){
-                       count = 3;
-                   }
-                   ghostDX[i] = dx[count];
-                   ghostDY[i] = dy[count];
-               }
-           }
-           ghostX[i] = ghostX[i] + (ghostDX[i] * ghostSpeed[i]);
-           ghostY[i] = ghostY[i] + (ghostDY[i] * ghostSpeed[i]);
-           drawGhost(g2d,ghostX[i]+1,ghostY[i]+1);
-
-           if (((PacMan.getInstance().getPacManX() > (ghostX[i] - 12)) && (PacMan.getInstance().getPacManX() < (ghostX[i] + 12)))
-                   && ((PacMan.getInstance().getPacManY() > (ghostY[i] - 12)) && (PacMan.getInstance().getPacManY() < (ghostY[i] + 12)))
-                   && runningGame) {
-               dying = true;
-           }
+           ghosts[i].moveGhost(this,g2d);
        }
     }
 
-    public void showIntroScreen(Graphics2D g2d){
+    private void showIntroScreen(Graphics2D g2d){
         String start = "Press SPACE to start";
         g2d.setColor(Color.yellow);
         g2d.drawString(start, SCREEN_SIZE_Y/4, 150);
     }
 
-    public void drawScore(Graphics2D g2d){
+    private void drawScore(Graphics2D g2d){
         g2d.setFont(font);
         g2d.setColor(new Color(5,151,79));
         String s = "Score:" + score;
@@ -199,23 +139,57 @@ public class PlayingField extends JPanel implements ActionListener {
         }
     }
 
-    public void drawGhost(Graphics2D g2d, int x, int y){
-        g2d.drawImage(blinky,x,y,this);
+    public void resetPowerPellets(){
+        screenData[52] = levelInfo[52];
+        screenData[77] = levelInfo[77];
+        screenData[572] = levelInfo[572];
+        screenData[597] = levelInfo[597];
     }
 
-    public void checkMaze(){
+    public void resetPellets(){
+        for (int i = 0; i < N_VERTICAL * N_HORIZONTAL; i++) {
+            if (i == 52 || i == 77 || i == 572 || i == 597){
+                continue;
+            } else{
+                screenData[i] = levelInfo[i];
+            }
+        }
+    }
+
+    public void resetGhosts(){
+        numGhosts = 0;
+        ghosts = new Ghost[MAX_GHOSTS];
+    }
+
+    public void changeSpeedGhosts(short speedAdded){
+        for (int i = 0; i < numGhosts; i++) {
+            if (currentSpeed+speedAdded > 5){
+                currentSpeed = 5;
+            }else if (currentSpeed+speedAdded < 0){
+                currentSpeed = 0;
+            }else {
+                currentSpeed = (short) (currentSpeed+speedAdded);
+            }
+            ghosts[i].setGhostSpeed(validSpeeds[currentSpeed]);
+        }
+    }
+
+    private void checkMaze(){
         int i = 0;
         boolean finished = true;
 
         while (i < N_HORIZONTAL*N_VERTICAL && finished){
-            if (screenData[i] != 0){
+            if ((screenData[i] & 80) != 0){
                 finished = false;
             }
             i++;
         }
+        /*
         if(finished){
-            startLevel();
+            resetPellets();
+            resetPowerPellets();
         }
+        */
     }
 
     private void death(){
@@ -226,7 +200,27 @@ public class PlayingField extends JPanel implements ActionListener {
         continueLevel();
     }
 
-    public void drawMaze(Graphics2D g2d){
+    public void activatePowerUp(){
+        for (int i = 0; i < numGhosts; i++){
+            ghosts[i].setVulnerableFlag(true);
+        }
+        Thread thread = new Thread(){
+            public void run(){
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                for (int i = 0; i < numGhosts; i++){
+                    ghosts[i].setVulnerableFlag(false);
+                }
+            }
+        };
+        thread.start();
+    }
+
+
+    private void drawMaze(Graphics2D g2d){
         int i = 0;
         int x,y;
 
@@ -251,8 +245,12 @@ public class PlayingField extends JPanel implements ActionListener {
                     g2d.drawLine(x,y+GRID_SIZE-1,x+GRID_SIZE-1,y+GRID_SIZE-1);
                 }
                 if ((screenData[i] & 16) != 0){
-                    g2d.setColor(new Color(255,255,255));
+                    g2d.setColor(new Color(255, 195, 112));
                     g2d.fillOval(x+10,y+10,4,4);
+                }
+                if ((screenData[i] & 64) != 0){
+                    g2d.setColor(new Color(255, 195, 112));
+                    g2d.fillOval(x+6,y+6,12,12);
                 }
                 i++;
             }
@@ -261,19 +259,36 @@ public class PlayingField extends JPanel implements ActionListener {
 
     }
 
+    public void addGhost(String ghostName){
+        if (numGhosts == 4){
+            return;
+        } else if (ghostName == "Clyde"){
+            ghosts[numGhosts] = new Clyde(validSpeeds[currentSpeed]);
+        } else if (ghostName == "Inky"){
+            ghosts[numGhosts] = new Inky(validSpeeds[currentSpeed]);
+        } else if (ghostName == "Pinky"){
+            ghosts[numGhosts] = new Pinky(validSpeeds[currentSpeed]);
+        } else{
+            ghosts[numGhosts] = new Blinky(validSpeeds[currentSpeed]);
+        }
+        numGhosts++;
+    }
+
+    public void addFruit(String fruitName, int points){
+        currentFruit = new Fruit(13 * GRID_SIZE,16 * GRID_SIZE, points, fruitName);
+    }
 
     private void continueLevel(){
-        int dx = 1;
+        numGhosts = 0;
+        ghosts = new Ghost[MAX_GHOSTS];
 
-        for (int i = 0; i < numGhosts; i++){
-            ghostY[i] = 10 * GRID_SIZE;
-            ghostX[i] = 13 * GRID_SIZE;
-            ghostDX[i] = dx;
-            ghostDY[i] = 0;
-            dx = -dx;
-            ghostSpeed[i] = PacMan.getInstance().PAC_SPEED;
-        }
+        addGhost("Clyde");
+        addGhost("Inky");
+        addGhost("Blinky");
+        addGhost("Pinky");
 
+        addFruit("Galaga",1000);
+        
         PacMan.getInstance().setPacManX(13 * GRID_SIZE);
         PacMan.getInstance().setPacManY(22 * GRID_SIZE);
         PacMan.getInstance().setPacManDX(0);
@@ -365,5 +380,21 @@ public class PlayingField extends JPanel implements ActionListener {
 
     public short[] getScreenData() {
         return screenData;
+    }
+
+    public boolean isRunningGame() {
+        return runningGame;
+    }
+
+    public void setRunningGame(boolean runningGame) {
+        this.runningGame = runningGame;
+    }
+
+    public boolean isDying() {
+        return dying;
+    }
+
+    public void setDying(boolean dying) {
+        this.dying = dying;
     }
 }

@@ -49,7 +49,7 @@ public class PlayingField extends JPanel implements ActionListener {
              0,  0,  0,  0,  0, 21,  0,  0, 19, 26, 26, 24, 26, 26, 24, 26, 26, 22,  0,  0, 21,  0,  0,  0,  0,  0,
              0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,
              0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,
-            26, 26, 26, 26, 26, 16, 26, 26, 20,  0,  0,  0,  0,  0,  0,  0,  0, 17, 26, 26, 16, 26, 26, 26, 26, 26,
+            58, 26, 26, 26, 26, 16, 26, 26, 20,  0,  0,  0,  0,  0,  0,  0,  0, 17, 26, 26, 16, 26, 26, 26, 26, 58,
              0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,
              0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,  0,  0,  0,  0,  0,
              0,  0,  0,  0,  0, 21,  0,  0, 17, 26, 26, 26, 26, 26, 26, 26, 26, 20,  0,  0, 21,  0,  0,  0,  0,  0,
@@ -96,7 +96,7 @@ public class PlayingField extends JPanel implements ActionListener {
         ghostSpeed = new int [MAX_GHOSTS];
         dx = new int[4];
         dy = new int[4];
-        timer = new Timer(80, this);
+        timer = new Timer(40, this);
         timer.restart();
     }
 
@@ -135,8 +135,15 @@ public class PlayingField extends JPanel implements ActionListener {
             ch = screenData[pos];
 
             if ((ch & 16) != 0){
-                screenData[pos] = (short)(ch & 15);
+                screenData[pos] = (short)(ch & 47);
                 score++;
+            }
+            if ((ch & 32) != 0){
+                if (pacManX < 100){
+                    pacManX = pacManX + GRID_SIZE*25;
+                } else{
+                    pacManX = pacManX - GRID_SIZE*25;
+                }
             }
             if (reqDX != 0 || reqDY != 0){
                 if (!((reqDX == -1 && reqDY == 0 && (ch & 1) != 0)
@@ -178,24 +185,32 @@ public class PlayingField extends JPanel implements ActionListener {
            if ( (ghostX[i] % GRID_SIZE == 0) && (ghostY[i] % GRID_SIZE == 0) ){
                pos = ghostX[i]/GRID_SIZE + N_HORIZONTAL * (ghostY[i]/GRID_SIZE);
                count = 0;
+               short ch = screenData[pos];
+               if ((ch & 32) != 0){
+                   if (ghostX[i] < 100){
+                       ghostX[i] = ghostX[i] + GRID_SIZE*25;
+                   } else{
+                       ghostX[i] = ghostX[i] - GRID_SIZE*25;
+                   }
+               }
                if ((screenData[pos]&1) == 0 && ghostDX[i] != 1){
                    dx[count] = -1;
-                   dx[count] = 0;
+                   dy[count] = 0;
                    count++;
                }
-               if ((screenData[pos]&2) == 0 && ghostDX[i] != 1){
+               if ((screenData[pos]&2) == 0 && ghostDY[i] != 1){
                    dx[count] = 0;
-                   dx[count] = -1;
+                   dy[count] = -1;
                    count++;
                }
                if ((screenData[pos]&4) == 0 && ghostDX[i] != -1){
                    dx[count] = 1;
-                   dx[count] = 0;
+                   dy[count] = 0;
                    count++;
                }
-               if ((screenData[pos]&8) == 0 && ghostDX[i] != -1){
+               if ((screenData[pos]&8) == 0 && ghostDY[i] != -1){
                    dx[count] = 0;
-                   dx[count] = 1;
+                   dy[count] = 1;
                    count++;
                }
                if (count==0){

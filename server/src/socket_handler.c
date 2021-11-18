@@ -26,6 +26,7 @@ void exit_socket_with_error(int* socket_desc, char* error_msg){
 	// Print error
 	fprintf(stderr, error_msg);
 	fflush(stderr);
+	removeClient(sock);
 	close(sock);
 	free(socket_desc);
 }
@@ -49,7 +50,6 @@ void *connection_handler(void *socket_desc)
 			if (value == NULL) {
 				char error_msg[] = "Unable to parse data";
 				exit_socket_with_error(socket_desc, error_msg);
-				removeClient(sock);
 				return (void *) 1;
 			}
 			if(value->type == json_object && strcmp(value->u.object.values[0].name, "init")==0){
@@ -73,7 +73,14 @@ void *connection_handler(void *socket_desc)
 				}
 			}
 			else{
-				writeToClient(sock, client_message);
+				// reroute messages to the appropiate observers
+				int id = getPlayerId(sock);
+				if(id == -1){
+					char error_msg[] =  "Trying to reroute messages from player socket that isn't in the clients vector (?!?!?! this really shouldn't happen";
+					exit_socket_with_error(socket_desc, error_msg);
+					return (void *) 1;
+				}
+				writeToObservers(id, client_message);
 			}
 
 			json_value_free(value);
@@ -85,6 +92,9 @@ void *connection_handler(void *socket_desc)
 	{
 		puts("Client disconnected");
 		fflush(stdout);
+		removeClient(sock);
+		free(socket_desc);
+		return 0;
 	}
 	else if(read_size == -1)
 	{

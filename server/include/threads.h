@@ -13,4 +13,7 @@ int addObserver(int socket, int observedPlayer);
 void removeClient(int socket);
 void writeToClient(int socket, char* client_message);
 void writeToPlayer(int playerId, char* client_message);
+void writeToObservers(int playerId, char* client_message);
+
+int getPlayerId(int socket);
 #endif

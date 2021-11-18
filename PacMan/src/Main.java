@@ -12,7 +12,7 @@ public class Main {
         Window pacManWindow = new Window();
         pacManWindow.setLocationRelativeTo(null);
         pacManWindow.setVisible(true);
-        pacManWindow.setTitle("Pa c-Man");
+        pacManWindow.setTitle("Pac-Man");
         pacManWindow.setSize(635, 775);
         pacManWindow.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 

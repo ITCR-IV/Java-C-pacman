@@ -281,13 +281,6 @@ public class PlayingField extends JPanel implements ActionListener {
     private void continueLevel(){
         numGhosts = 0;
         ghosts = new Ghost[MAX_GHOSTS];
-
-        addGhost("Clyde");
-        addGhost("Inky");
-        addGhost("Blinky");
-        addGhost("Pinky");
-
-        addFruit("Galaga",1000);
         
         PacMan.getInstance().setPacManX(13 * GRID_SIZE);
         PacMan.getInstance().setPacManY(22 * GRID_SIZE);

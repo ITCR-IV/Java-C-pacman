@@ -5,6 +5,14 @@
 
 #include "threads.h"
 
+// Función para contar dígitos
+int contar_digitos(int num){
+	if (num==0)
+		return 0;
+	return 1 + contar_digitos(num/10);
+}
+
+
 // Función para parsear comandos relacionados a fantasmas
 void ghost(int which, char* args){
 	char* ghost_str;
@@ -29,13 +37,22 @@ void ghost(int which, char* args){
 	int arg;
 	char junk;
 	if( 1 == sscanf(args, "%d", &arg)){ 
-		printf("Creando a %s para el jugador %d!\n",ghost_str, arg);
+		char str[] ="Creando a %s para el jugador %d!\n";
+		printf(str,ghost_str, arg);
+		// crea buffer que debería tener hasta 4 espacios más de lo necesario
+		char msg[strlen(str)+strlen(ghost_str)+contar_digitos(arg)]; 
+		sprintf(msg, str, ghost_str, arg);
+		writeToPlayer(arg, msg);
 	}
 	else if( 1 == sscanf(args, "%c", &junk)){ // Si detecta algún char que no sea dígito entonces todo mal
 		printf("Uso incorrecto, el uso correcto de este comando es:\n%s [jugador]\n", ghost_str);
 	}
 	else{
-		printf("Creando a %s para el jugador 0\n", ghost_str);
+		char str[] ="Creando a %s para el jugador 0\n";
+		printf(str,ghost_str);
+		char msg[strlen(str)+strlen(ghost_str)]; 
+		sprintf(msg, str, ghost_str, arg);
+		writeToPlayer(0, msg);
 	}
 }
 
@@ -100,7 +117,8 @@ char* help_text = "posibles comandos:\n"
 
 	while(getQuit() == 0){
 		//printf("Enter a command:\n");
-		printf("> ");
+		fputs("> ", stdout);
+		fflush(stdout);
 		// command
 		fscanf(stdin, "%29s", command);
 

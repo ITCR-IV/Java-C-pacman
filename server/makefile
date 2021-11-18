@@ -8,10 +8,10 @@ SRCDIR=src
 
 LIBS=-lm -lpthread
 
-_DEPS = prompt.h threads.h
+_DEPS = constants.h prompt.h threads.h json.h vec.h socket_handler.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o prompt.o threads.o
+_OBJ = main.o prompt.o threads.o json.o vec.o socket_handler.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 #$(info $$OBJ/%.o is [${OBJ}])

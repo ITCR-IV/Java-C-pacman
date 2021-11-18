@@ -15,6 +15,7 @@ public class SockManager implements Runnable {
     private ClientType type;
     private boolean quit = false;
     private boolean offline = false;
+    PlayingField field;
 
     private void buildSocket(String address, int port) {
         // establish a connection
@@ -32,7 +33,8 @@ public class SockManager implements Runnable {
     }
 
     // Este constructor conecta un jugador
-    public SockManager(String address, int port) {
+    public SockManager(PlayingField playingField, String address, int port) {
+        field = playingField;
         type = ClientType.PLAYER;
         buildSocket(address, port);
         JsonObject json = new JsonObject();
@@ -48,7 +50,8 @@ public class SockManager implements Runnable {
     }
 
     // Este constructor conecta un observador al jugador observedPlayer
-    public SockManager(String address, int port, int observedPlayer) {
+    public SockManager(PlayingField playingField, String address, int port, int observedPlayer) {
+        field = playingField;
         type = ClientType.OBSERVER;
         buildSocket(address, port);
 
@@ -109,6 +112,19 @@ public class SockManager implements Runnable {
                     quit = true;
                     System.out.println("Error en socket: " + json.getString(errorKey));
                     closeSocket();
+                } else if (keys.contains("ghost")) {
+                    final JsonKey ghostKey = Jsoner.mintJsonKey("ghost", "blinky");
+
+                } else if (keys.contains("pastillas")) {
+
+                } else if (keys.contains("fruta")) {
+
+                } else if (keys.contains("aumentar")) {
+
+                } else if (keys.contains("disminuir")) {
+
+                } else {
+                    // AQUÍ LLEGAN TODOS LOS MENSAJES QUE LE CORRESPONDEN A LOS OBSERVERS
                 }
 
             } catch (JsonException j) {

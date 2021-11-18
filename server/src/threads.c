@@ -126,6 +126,7 @@ int addObserver(int socket, int observedPlayer){
 }
 
 void writeToPlayer(int playerId, char* client_message){
+	puts(client_message);
 	pthread_mutex_lock(&clientsMutex);
 	struct client* curr_client;
 	for(int i = 0; i < clients_vec.length; i++){
@@ -161,6 +162,10 @@ void writeToObservers(int playerId, char* client_message){
 }
 
 void writeToClient(int socket, char* client_message){
+	//char cat_nl[strlen(client_message)+1];
+	//strcpy(cat_nl, client_message);
+	//strcat(cat_nl, "\n");
+
 	pthread_mutex_lock(&socket_writeMutex);
 	write(socket , client_message , strlen(client_message));
 	pthread_mutex_unlock(&socket_writeMutex);

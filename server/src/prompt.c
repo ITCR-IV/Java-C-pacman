@@ -18,16 +18,16 @@ void ghost(int which, char* args){
 	char* ghost_str;
 	switch(which) {
 		case 0:
-			ghost_str = "blinky";
+			ghost_str = "Blinky";
 			break;
 		case 1:
-			ghost_str = "pinky";
+			ghost_str = "Pinky";
 			break;
 		case 2:
-			ghost_str = "inky";
+			ghost_str = "Inky";
 			break;
 		case 3:
-			ghost_str = "clyde";
+			ghost_str = "Clyde";
 			break;
 		default:
 			printf("Dado un valor malo de 'which' a la función ghost en prompt.c");

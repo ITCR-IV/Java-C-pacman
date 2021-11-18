@@ -103,8 +103,11 @@ public class SockManager implements Runnable {
             return;
         }
         while (!quit) {
+            char[] msg = new char[6000];
             try {
-                JsonObject json = (JsonObject) Jsoner.deserialize(in);
+                in.read(msg);
+                System.out.println(msg);
+                JsonObject json = (JsonObject) Jsoner.deserialize(new String(msg).replace("\0", ""));
                 Set<String> keys = json.keySet();
 
                 if (keys.contains("Error")) {
@@ -113,8 +116,11 @@ public class SockManager implements Runnable {
                     System.out.println("Error en socket: " + json.getString(errorKey));
                     closeSocket();
                 } else if (keys.contains("ghost")) {
-                    final JsonKey ghostKey = Jsoner.mintJsonKey("ghost", "blinky");
-
+                    System.out.println("Request de fantasma recibido: " + json.toJson());
+                    final JsonKey ghostKey = Jsoner.mintJsonKey("ghost", "Clyde");
+                    String ghost = json.getString(ghostKey);
+                    System.out.println("Fantasma: " + ghost);
+                    field.addGhost(ghost);
                 } else if (keys.contains("pastillas")) {
 
                 } else if (keys.contains("fruta")) {
@@ -129,6 +135,9 @@ public class SockManager implements Runnable {
 
             } catch (JsonException j) {
                 System.out.println(j);
+                quit = true;
+            } catch (IOException i) {
+                System.out.println(i);
                 quit = true;
             }
         }

@@ -262,11 +262,11 @@ public class PlayingField extends JPanel implements ActionListener {
     public void addGhost(String ghostName){
         if (numGhosts == 4){
             return;
-        } else if (ghostName == "Clyde"){
+        } else if (ghostName.equals("Clyde")){
             ghosts[numGhosts] = new Clyde(validSpeeds[currentSpeed]);
-        } else if (ghostName == "Inky"){
+        } else if (ghostName.equals("Inky")){
             ghosts[numGhosts] = new Inky(validSpeeds[currentSpeed]);
-        } else if (ghostName == "Pinky"){
+        } else if (ghostName.equals("Pinky")){
             ghosts[numGhosts] = new Pinky(validSpeeds[currentSpeed]);
         } else{
             ghosts[numGhosts] = new Blinky(validSpeeds[currentSpeed]);

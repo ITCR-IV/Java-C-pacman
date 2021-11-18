@@ -31,6 +31,7 @@ void exit_socket_with_error(int* socket_desc, char* error_msg){
 	free(socket_desc);
 }
 
+// Función para que los threads manejen a cada cliente de forma individual
 void *connection_handler(void *socket_desc)
 {
 	//Get the socket descriptor

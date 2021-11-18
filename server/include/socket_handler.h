@@ -3,6 +3,7 @@
 
 enum ClientTypes{OBSERVER, PLAYER};
 
+// Struct con información necesaria para manejar clientes
 struct client {
 	 enum ClientTypes type;
 	 int socket;

@@ -49,6 +49,7 @@ int getPlayerId(int socket){
 		curr_client = (struct client*) vec_get(&clients_vec, i);
 		enum ClientTypes type = curr_client->type;
 		int client_socket = curr_client->socket;
+		// Revisar que sea un jugador y que el socket matchea
 		if(type == PLAYER && socket == client_socket){
 			pthread_mutex_unlock(&clientsMutex);
 			return curr_client->playerNum;
@@ -75,6 +76,7 @@ int addPlayer(int socket){
 	for(int i = 0; i < clients_vec.length; i++){
 		struct client* curr_client = (struct client*) vec_get(&clients_vec, i);
 		enum ClientTypes type = curr_client->type;
+		// Revisamos cuántos jugadores hay
 		if(type == PLAYER){
 			players++;
 			last_id_seen = curr_client->playerNum;
@@ -107,6 +109,7 @@ int addObserver(int socket, int observedPlayer){
 		curr_client = (struct client*) vec_get(&clients_vec, i);
 		enum ClientTypes type = curr_client->type;
 		int id = curr_client->playerNum;
+		// Revisamos que sí exsita el jugador
 		if(type == PLAYER && id == observedPlayer){
 			struct client* newClient = (struct client*) vec_emplace(&clients_vec);
 			newClient->type = OBSERVER;
@@ -147,6 +150,7 @@ void writeToObservers(int playerId, char* client_message){
 		curr_client = (struct client*) vec_get(&clients_vec, i);
 		enum ClientTypes type = curr_client->type;
 		int id = curr_client->playerNum;
+		// Enviamos un mensaje a todos los observers con id igual al del jugador
 		if(type == OBSERVER && id == playerId){
 			int socket = curr_client->socket;
 			writeToClient(socket, client_message);

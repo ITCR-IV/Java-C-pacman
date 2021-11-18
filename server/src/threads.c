@@ -132,6 +132,7 @@ void writeToPlayer(int playerId, char* client_message){
 		if(type == PLAYER && id == playerId){
 			int socket = curr_client->socket;
 			writeToClient(socket, client_message);
+			pthread_mutex_unlock(&clientsMutex);
 			return;
 		}
 	}

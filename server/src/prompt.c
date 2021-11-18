@@ -37,21 +37,21 @@ void ghost(int which, char* args){
 	int arg;
 	char junk;
 	if( 1 == sscanf(args, "%d", &arg)){ 
-		char str[] ="Creando a %s para el jugador %d!\n";
-		printf(str,ghost_str, arg);
-		// crea buffer que debería tener hasta 4 espacios más de lo necesario
-		char msg[strlen(str)+strlen(ghost_str)+contar_digitos(arg)]; 
-		sprintf(msg, str, ghost_str, arg);
+		printf("Creando a %s para el jugador %d!\n",ghost_str, arg);
+		// crea buffer que debería tener 2 espacios más de lo necesario
+		char str[] ="{ \"ghost\": \"%s\" }";
+		char msg[strlen(str)+strlen(ghost_str)]; 
+		sprintf(msg, str, ghost_str);
 		writeToPlayer(arg, msg);
 	}
 	else if( 1 == sscanf(args, "%c", &junk)){ // Si detecta algún char que no sea dígito entonces todo mal
 		printf("Uso incorrecto, el uso correcto de este comando es:\n%s [jugador]\n", ghost_str);
 	}
 	else{
-		char str[] ="Creando a %s para el jugador 0\n";
-		printf(str,ghost_str);
+		printf("Creando a %s para el jugador 0\n",ghost_str);
+		char str[] ="{ \"ghost\": \"%s\" }";
 		char msg[strlen(str)+strlen(ghost_str)]; 
-		sprintf(msg, str, ghost_str, arg);
+		sprintf(msg, str, ghost_str);
 		writeToPlayer(0, msg);
 	}
 }
@@ -70,7 +70,7 @@ void pastillas(int which, char* args){
 			pasti_str = "grandes";
 			break;
 		case 1:
-			pasti_str = "pequeñas";
+			pasti_str = "peques";
 			break;
 		default:
 			printf("Dado un valor malo de 'which' a la función pastillas en prompt.c");
@@ -81,12 +81,20 @@ void pastillas(int which, char* args){
 	char junk;
 	if( 1 == sscanf(args, "%d", &arg)){ 
 		printf("Reseteando las pastillas %s para el jugador %d!\n",pasti_str, arg);
+		char str[] ="{ \"pastillas\": \"%s\" }";
+		char msg[strlen(str)+strlen(pasti_str)]; 
+		sprintf(msg, str, pasti_str);
+		writeToPlayer(arg, msg);
 	}
 	else if( 1 == sscanf(args, "%c", &junk)){ // Si detecta algún char que no sea dígito entonces todo mal
 		printf("Uso incorrecto, el uso correcto de este comando es:\n%s [jugador]\n", which ? "pasti" : "pastillas" );
 	}
 	else{
 		printf("Reseteando las pastillas %s para el jugador 0\n", pasti_str);
+		char str[] ="{ \"pastillas\": \"%s\" }";
+		char msg[strlen(str)+strlen(pasti_str)]; 
+		sprintf(msg, str, pasti_str);
+		writeToPlayer(0, msg);
 	}
 }
 
@@ -172,6 +180,10 @@ char* help_text = "posibles comandos:\n"
 			// Caso válido
 			else if(1 <= sscanf(args, "%d %d", &arg1, &arg2)){ // Si se tiene aunque sea el primer arg
 				printf("Creando una fruta de %d puntos para el jugador %d!\n", arg1, arg2);
+				char str[] ="{ \"fruta\": %d }";
+				char msg[strlen(str)+contar_digitos(arg1)]; 
+				sprintf(msg, str, arg1);
+				writeToPlayer(arg2, msg);
 			}
 			// Casos donde no se puso ni un dígito
 			else{
@@ -193,9 +205,17 @@ char* help_text = "posibles comandos:\n"
 			else if( 1 <= sscanf(args, " %c %d %d", &PoM, &arg1, &arg2)){
 				if(PoM == '+'){ // Aumento
 					printf("Aumentando la velocidad de los fantasmas del jugador %d, en %d incrementos!\n", arg2, arg1);
+					char str[] ="{ \"aumentar\": %d }";
+					char msg[strlen(str)+contar_digitos(arg1)]; 
+					sprintf(msg, str, arg1);
+					writeToPlayer(arg2, msg);
 				}
 				else if(PoM == '-'){ // Disminución
 					printf("Disminuyendo la velocidad de los fantasmas del jugador %d, en %d incrementos\n", arg2, arg1);
+					char str[] ="{ \"disminuir\": %d }";
+					char msg[strlen(str)+contar_digitos(arg1)]; 
+					sprintf(msg, str, arg1);
+					writeToPlayer(arg2, msg);
 				}
 				else{ // Inválido si no se dio un + o un -
 					printf("Uso incorrecto, debe especificar si + o -. El uso correcto de este comando es:\nvelocidad +/- [n] [jugador]\n");

@@ -78,3 +78,8 @@ Cliente hecho en Java
 {"init": "player"} -> lo envía el cliente como primer mensaje para conectarse como un nuevo jugador, máximo de 2 jugadores
 {"init": "observer", "observee": n} -> lo envía el cliente como primer mensaje para conectarse como un nuevo observador que observa al jugador n (0-1)
 {"Error": "msg"} -> el servidor retorna un mensaje de error al cliente cuando algo sale mal antes de cerrar la conexión
+{"ghost": "name"} -> el servidor le indica al cliente que spawnee el fantasma con nombre 'name'
+{"pastillas": "size"} -> el servidor le indica al cliente que resetee las pastillas del tamaño indicado por 'size', puede ser "grandes" o "peques"
+{"fruta": n} -> servidor le indica al cliente que cree una fruta de n puntos
+{"aumentar": n} -> servidor le indica al cliente que aumente la velocidad en n pasos
+{"aumentar": n} -> servidor le indica al cliente que disminuya la velocidad en n pasos

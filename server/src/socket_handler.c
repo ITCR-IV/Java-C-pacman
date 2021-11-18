@@ -44,6 +44,10 @@ void *connection_handler(void *socket_desc)
 		json_char* json;
 		json_value* value;
 		do {
+			//puts("Mensaje: ");
+			//puts(client_message);
+			//printf("Se leyeron %d bytes\n", read_size);
+
 			json = (json_char*)client_message;
 			value = json_parse(json,strlen(client_message));
 
@@ -76,15 +80,18 @@ void *connection_handler(void *socket_desc)
 				// reroute messages to the appropiate observers
 				int id = getPlayerId(sock);
 				if(id == -1){
-					char error_msg[] =  "Trying to reroute messages from player socket that isn't in the clients vector (?!?!?! this really shouldn't happen";
+					char error_msg[] =  "Trying to reroute messages from player socket that isn't in the clients vector (probably a msg got sent from an observer or unregistered client)";
 					exit_socket_with_error(socket_desc, error_msg);
 					return (void *) 1;
 				}
+				//printf("Rerouting from player %d to observers\n", id);
 				writeToObservers(id, client_message);
 			}
 
 			json_value_free(value);
-			//Send the message back to client
+
+			// Reset buffer
+			memset(&client_message, 0, read_size);
 		} while( (read_size = recv(sock , client_message , BUFFER_SIZE , 0)) > 0 && getQuit() == 0);
 	}
 

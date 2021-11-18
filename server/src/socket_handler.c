@@ -78,6 +78,13 @@ void *connection_handler(void *socket_desc)
 					}
 				}
 			}
+			else if( value->type == json_object && strcmp(value->u.object.values[0].name, "Info")==0){
+				fputs("INFO: ", stdout);
+				fputs(value->u.object.values[0].value->u.string.ptr, stdout);
+				fputs("\n", stdout);
+				fflush(stdout);
+			}
+
 			else{
 				// reroute messages to the appropiate observers
 				int id = getPlayerId(sock);

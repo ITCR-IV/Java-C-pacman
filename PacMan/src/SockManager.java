@@ -71,8 +71,16 @@ public class SockManager implements Runnable {
 
     }
 
+    public void sendInfo(String infoMsg) {
+        JsonObject json = new JsonObject();
+        json.put("Info", infoMsg);
+        sendJSON(json);
+    }
+
     public void sendJSON(JsonObject json) {
-        out.println(Jsoner.serialize(json));
+        synchronized (socket) {
+            out.println(Jsoner.serialize(json));
+        }
     }
 
     // cerrar conexión

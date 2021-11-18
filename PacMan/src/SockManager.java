@@ -153,8 +153,18 @@ public class SockManager implements Runnable {
                     }
 
                 } else if (keys.contains("aumentar")) {
+                    System.out.println("Request de aumentar velocidad recibido: " + json.toJson());
+                    final JsonKey rapidoKey = Jsoner.mintJsonKey("aumentar", 1000);
+                    int valor = json.getInteger(rapidoKey);
+                    System.out.println("Aumentando velocidad en: " + valor);
+                    field.changeSpeedGhosts((short) valor);
 
                 } else if (keys.contains("disminuir")) {
+                    System.out.println("Request de disminuir velocidad recibido: " + json.toJson());
+                    final JsonKey slowKey = Jsoner.mintJsonKey("disminuir", 1000);
+                    int valor = json.getInteger(slowKey);
+                    System.out.println("Disminuyendo velocidad en: " + valor);
+                    field.changeSpeedGhosts((short) (-1 * valor));
 
                 } else {
                     // AQUÍ LLEGAN TODOS LOS MENSAJES QUE LE CORRESPONDEN A LOS OBSERVERS

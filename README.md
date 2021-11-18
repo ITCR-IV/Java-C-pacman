@@ -16,7 +16,7 @@ Servidor hecho en C
 
 El servidor puede aceptar múltiples clientes al mismo tiempo (aunque solo 2 máximos jugadores).
 Se va a usar un thread por cliente y un thread para el prompt de comandos.
-
+u
 ### Comandos
 
 - help
@@ -74,3 +74,7 @@ Cliente hecho en Java
 - Paquetes
 - 3 patrones de diseño
 
+# Comunicación JSON
+{"init": "player"} -> lo envía el cliente como primer mensaje para conectarse como un nuevo jugador, máximo de 2 jugadores
+{"init": "observer", "observee": n} -> lo envía el cliente como primer mensaje para conectarse como un nuevo observador que observa al jugador n (0-1)
+{"Error": "msg"} -> el servidor retorna un mensaje de error al cliente cuando algo sale mal antes de cerrar la conexión

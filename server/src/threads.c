@@ -167,7 +167,7 @@ void writeToClient(int socket, char* client_message){
 }
 
 void removeObservers(int id){
-	printf("Removing observers with id %d\n");
+	printf("Removing observers with id %d\n", id);
 	for(int i = 0; i < clients_vec.length; i++){
 		struct client* curr_client = (struct client*) vec_get(&clients_vec, i);
 		int observerId = curr_client->playerNum;

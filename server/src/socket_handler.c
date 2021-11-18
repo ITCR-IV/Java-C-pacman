@@ -37,7 +37,8 @@ void *connection_handler(void *socket_desc)
 	//Get the socket descriptor
 	int sock = *(int*)socket_desc;
 	int read_size;
-	char *message , client_message[BUFFER_SIZE];
+	char client_message[BUFFER_SIZE];
+	memset(&client_message, 0, read_size);
 
 	//Receive messages from client
 	read_size = recv(sock , client_message , BUFFER_SIZE , 0);
@@ -45,9 +46,9 @@ void *connection_handler(void *socket_desc)
 		json_char* json;
 		json_value* value;
 		do {
-			//puts("Mensaje: ");
-			//puts(client_message);
-			//printf("Se leyeron %d bytes\n", read_size);
+			puts("Mensaje: ");
+			puts(client_message);
+			printf("Se leyeron %d bytes\n", read_size);
 
 			json = (json_char*)client_message;
 			value = json_parse(json,strlen(client_message));

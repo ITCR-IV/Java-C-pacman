@@ -122,8 +122,35 @@ public class SockManager implements Runnable {
                     System.out.println("Fantasma: " + ghost);
                     field.addGhost(ghost);
                 } else if (keys.contains("pastillas")) {
-
+                    System.out.println("Request de pastillas recibido: " + json.toJson());
+                    final JsonKey pastiKey = Jsoner.mintJsonKey("pastillas", "grandes");
+                    String tamano = json.getString(pastiKey);
+                    System.out.println("Pastillas: " + tamano);
+                    if (tamano.equals("peques")) {
+                        field.resetPellets();
+                    } else if (tamano.equals("grandes")) {
+                        field.resetPowerPellets();
+                    }
                 } else if (keys.contains("fruta")) {
+                    System.out.println("Request de pastillas recibido: " + json.toJson());
+                    final JsonKey frutaKey = Jsoner.mintJsonKey("fruta", 1000);
+                    int valor = json.getInteger(frutaKey);
+                    System.out.println("Fruta: " + valor);
+                    if (valor > 6000) {
+                        field.addFruit("Key", valor);
+                    } else if (valor > 5000) {
+                        field.addFruit("Orange", valor);
+                    } else if (valor > 4000) {
+                        field.addFruit("Melon", valor);
+                    } else if (valor > 3000) {
+                        field.addFruit("Strawberry", valor);
+                    } else if (valor > 2000) {
+                        field.addFruit("Galaga", valor);
+                    } else if (valor > 1000) {
+                        field.addFruit("Cherry", valor);
+                    } else {
+                        field.addFruit("Apple", valor);
+                    }
 
                 } else if (keys.contains("aumentar")) {
 
